@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rehan AI Pro v2</title>
+<style>
+:root{color-scheme:dark;--bg:#080d16;--p:#111b2b;--p2:#0b1422;--line:#263750;--muted:#91a2ba;--txt:#edf4ff;--g:#24d69a;--r:#ff657d;--y:#ffc36b;--b:#79aaff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#203657 0,#080d16 55%);color:var(--txt);font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif}
+main{max-width:1180px;margin:auto;padding:18px 14px 36px}.head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{display:flex;gap:11px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#27dfa1,#287bd4);display:grid;place-items:center;color:#04130f;font-weight:950;font-size:20px}h1{margin:0;font-size:22px}.muted,.tiny{color:var(--muted)}.tiny{font-size:11px}.pill{border:1px solid var(--line);padding:7px 11px;border-radius:99px;color:var(--y);font-size:11px}
+.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.8fr);gap:13px;margin-top:16px}.card{background:linear-gradient(180deg,#121e30,#0d1726);border:1px solid var(--line);border-radius:16px;padding:15px;min-width:0}.card h2{font-size:14px;margin:0 0 12px}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field label{font-size:11px;color:var(--muted)}select,input,textarea{width:100%;min-width:0;background:#081222;border:1px solid #30445f;border-radius:9px;padding:10px;color:var(--txt);font:inherit}button{border:0;border-radius:9px;padding:10px 13px;background:var(--g);color:#03140e;font-weight:800;cursor:pointer}button.alt{background:#22334d;color:var(--txt);border:1px solid #344967}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.chartbox{margin-top:12px;background:#081321;border:1px solid var(--line);border-radius:12px;padding:8px}.charttop{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:2px 4px 8px}.charttop strong{font-size:13px}canvas{display:block;width:100%;height:260px}
+.signal{background:#081321;border:1px solid var(--line);border-radius:13px;padding:17px;text-align:center;min-height:160px;display:flex;flex-direction:column;justify-content:center}.signal .word{font-size:37px;font-weight:950;letter-spacing:1px}.call{color:var(--g)}.put{color:var(--r)}.wait{color:var(--y)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.stat{background:#0a1422;border:1px solid var(--line);border-radius:10px;padding:10px}.stat b{display:block;font-size:16px}.stat span{font-size:10px;color:var(--muted)}
+.reasons{font-size:12px;color:var(--muted);margin-top:10px}.bar{height:6px;background:#23334a;border-radius:8px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;width:0;background:var(--g)}
+.history{max-height:210px;overflow:auto}table{width:100%;border-collapse:collapse;font-size:11px}td,th{text-align:left;padding:8px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.full{margin-top:13px}.disclaimer{font-size:11px;color:var(--muted);margin:10px 2px 0}.green{color:var(--g)}.red{color:var(--r)}.yellow{color:var(--y)}
+details{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}summary{color:var(--b);cursor:pointer;font-size:12px}code{color:#b9d5ff;overflow-wrap:anywhere}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.controls{grid-template-columns:1fr 1fr}canvas{height:220px}}@media(max-width:400px){.controls{grid-template-columns:1fr}}
+</style></head>
+<body><main>
+<header class="head"><div class="brand"><div class="logo">R</div><div><h1>REHAN AI PRO</h1><div class="tiny">AUTONOMOUS CHART SCANNER · SIGNAL ONLY · V2.0</div></div></div><div class="pill" id="conn">● DEMO DATA</div></header>
+<div class="layout">
+<section class="card">
+<h2>Market scanner</h2>
+<div class="controls">
+<div class="field"><label>Market</label><select id="market"><option>Real Market</option><option>OTC</option></select></div>
+<div class="field"><label>Asset</label><select id="asset"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>AUD/USD</option><option>BTC/USD</option><option>USD/PKR</option></select></div>
+<div class="field"><label>Scan interval</label><select id="interval"><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option></select></div>
+</div>
+<div class="actions"><button id="start">Start auto scanner</button><button id="once" class="alt">Scan now</button><button id="stop" class="alt" disabled>Stop</button></div>
+<div class="chartbox"><div class="charttop"><strong id="chartname">EUR/USD · DEMO CANDLES</strong><span class="tiny" id="lastprice">Waiting…</span></div><canvas id="chart" width="900" height="300"></canvas></div>
+<p class="disclaimer">Demo chart uses generated sample candles. A real feed must be connected below before signals can represent the live market.</p>
+</section>
+<aside class="card">
+<h2>AI signal panel</h2><div class="signal"><div class="tiny" id="signalmeta">NO LIVE FEED CONNECTED</div><div class="word wait" id="signal">WAIT</div><div class="muted" id="confidence">Confidence score: —</div><div class="bar"><i id="bar"></i></div><div class="tiny" id="explain" style="margin-top:10px">Connect data or run demo scan to inspect sample candles.</div></div>
+<div class="stats"><div class="stat"><b id="trend">—</b><span>Trend</span></div><div class="stat"><b id="pattern">—</b><span>Pattern</span></div><div class="stat"><b id="rsi">—</b><span>RSI (14)</span></div></div>
+<p class="disclaimer">Score is a technical rule score, not a win probability. NO TRADE is a valid result.</p>
+</aside></div>
+<section class="card full"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="margin:0">Signal history</h2><button class="alt" id="clear" style="font-size:11px;padding:7px">Clear</button></div><div class="history" style="margin-top:8px"><table><thead><tr><th>Time</th><th>Market</th><th>Asset</th><th>Signal</th><th>Score</th><th>Reason</th></tr></thead><tbody id="hist"><tr><td colspan="6" class="muted">No scans yet.</td></tr></tbody></table></div></section>
+<section class="card full"><h2>Connect chart data feed</h2><p class="tiny">This prototype can read candles from your own HTTPS REST endpoint or WebSocket feed. It does not log in to Quotex, scrape its private interface, or place trades. Use only a data source you are authorized to access.</p>
+<div class="controls" style="grid-template-columns:1fr 1fr">
+<div class="field"><label>Feed type</label><select id="feedtype"><option value="rest">HTTPS REST</option><option value="ws">WebSocket</option></select></div>
+<div class="field"><label>Feed URL</label><input id="feedurl" placeholder="https://your-server/candles or wss://…"></div>
+</div><div class="controls" style="grid-template-columns:1fr 1fr;margin-top:9px">
+<div class="field"><label>Optional bearer token (testing only)</label><input id="token" type="password" placeholder="Token"></div>
+<div class="field"><label>Expected data</label><input readonly value="candles: [{open,high,low,close}]"></div>
+</div><div class="actions"><button id="connect" class="alt">Connect & test feed</button><button id="disconnect" class="alt" disabled>Disconnect feed</button></div>
+<details><summary>Feed JSON format and technical notes</summary><p class="tiny">REST response: <code>{"candles":[{"open":1.08,"high":1.081,"low":1.079,"close":1.0805}, ...]}</code>. WebSocket can send the same JSON object repeatedly. Send at least 20 closed OHLC candles in chronological order. For OTC, feed must match the exact OTC asset and quotes shown on your Quotex screen; generic FX feeds are not a substitute.</p></details>
+</section>
+<footer class="disclaimer" style="text-align:center;margin-top:15px">REHAN AI PRO V2 · Educational research prototype · Not financial advice · No guaranteed accuracy or returns.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);let data=[],timer=null,ws=null,rows=[],mode='demo',seed=1.0800;
+function status(t,c='yellow'){$('conn').textContent='● '+t;$('conn').style.color=c==='green'?'var(--g)':c==='red'?'var(--r)':'var(--y)'}
+function makeDemo(){let p=seed,arr=[];for(let i=0;i<45;i++){let o=p,move=(Math.random()-.485)*.0008,c=o+move,h=Math.max(o,c)+Math.random()*.00025,l=Math.min(o,c)-Math.random()*.00025;arr.push({open:o,high:h,low:l,close:c});p=c}seed=p;return arr}
+function valid(a){if(!Array.isArray(a)||a.length<20)throw Error('Feed mein kam az kam 20 candles required hain.');return a.slice(-100).map((x,i)=>{let o=+x.open,h=+x.high,l=+x.low,c=+x.close;if(![o,h,l,c].every(Number.isFinite)||h<Math.max(o,c,l)||l>Math.min(o,c,h))throw Error('Invalid OHLC candle at '+i);return{open:o,high:h,low:l,close:c}})}
+function rsi(closes,n=14){if(closes.length<n+1)return null;let up=0,dn=0;for(let i=closes.length-n;i<closes.length;i++){let d=closes[i]-closes[i-1];if(d>0)up+=d;else dn-=d}if(dn===0)return 100;let rs=(up/n)/(dn/n);return 100-100/(1+rs)}
+function calc(a){let x=a[a.length-1],p=a[a.length-2],cl=a.map(z=>z.close),body=Math.abs(x.close-x.open),range=Math.max(x.high-x.low,1e-12),uw=x.high-Math.max(x.open,x.close),lw=Math.min(x.open,x.close)-x.low;let pat='Mixed',ps=0,why=[];
+if(x.close> x.open&&p.close<p.open&&x.open<=p.close&&x.close>=p.open){pat='Bullish engulfing';ps=2;why.push(pat)}
+else if(x.close<x.open&&p.close>p.open&&x.open>=p.close&&x.close<=p.open){pat='Bearish engulfing';ps=-2;why.push(pat)}
+else if(lw>body*2&&uw<body&&body/range<.4){pat='Hammer';ps=1.5;why.push('Bullish rejection')}
+else if(uw>body*2&&lw<body&&body/range<.4){pat='Shooting star';ps=-1.5;why.push('Bearish rejection')}
+else if(body/range<.1){pat='Doji';why.push('Indecision candle')}
+let avg3=cl.slice(-3).reduce((s,v)=>s+v,0)/3,avg20=cl.slice(-20).reduce((s,v)=>s+v,0)/20,ts=avg3>avg20?1:avg3<avg20?-1:0,tr=ts===1?'UP':ts===-1?'DOWN':'SIDEWAYS';why.push('Trend '+tr);
+let mom=x.close>p.close?1:x.close<p.close?-1:0,rv=rsi(cl),rs=rv===null?0:rv>70?-1:rv<30?1:0;if(rv!==null)why.push('RSI '+rv.toFixed(1));
+let score=ps+ts+mom+rs;if(rv!==null&&rv>70&&score>0)score-=1;if(rv!==null&&rv<30&&score<0)score+=1;
+let sig=score>=3?'CALL':score<=-3?'PUT':'NO TRADE';let conf=Math.min(95,Math.round(48+Math.abs(score)*10));return{sig,conf,tr,pat,rsi:rv===null?'—':rv.toFixed(1),why:why.join(' · ')}}
+function draw(a){let c=$('chart'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.strokeStyle='#1b2b41';ctx.lineWidth=1;for(let j=1;j<5;j++){let y=j*h/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}let lo=Math.min(...a.map(z=>z.low)),hi=Math.max(...a.map(z=>z.high)),pad=(hi-lo)*.12||.001;lo-=pad;hi+=pad;let y=v=>h-12-(v-lo)/(hi-lo)*(h-24),step=w/a.length,bw=Math.max(4,step*.56);a.forEach((z,i)=>{let x=i*step+step/2,up=z.close>=z.open;ctx.strokeStyle=up?'#24d69a':'#ff657d';ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(x,y(z.high));ctx.lineTo(x,y(z.low));ctx.stroke();let top=y(Math.max(z.open,z.close)),bot=y(Math.min(z.open,z.close));ctx.fillRect(x-bw/2,top,bw,Math.max(2,bot-top))});$('lastprice').textContent=a[a.length-1].close.toFixed(5)}
+function scan(a,source){data=valid(a);let r=calc(data),m=$('market').value,asset=$('asset').value;$('signal').textContent=r.sig;$('signal').className='word '+(r.sig==='CALL'?'call':r.sig==='PUT'?'put':'wait');$('signalmeta').textContent=m+' · '+asset+' · '+source;$('confidence').textContent='Rule score: '+r.conf+'/100';$('bar').style.width=r.conf+'%';$('trend').textContent=r.tr;$('pattern').textContent=r.pat;$('rsi').textContent=r.rsi;$('explain').textContent=r.why; $('chartname').textContent=asset+' · '+source.toUpperCase();draw(data);rows.unshift({time:new Date().toLocaleTimeString(),m,asset,...r});rows=rows.slice(0,50);$('hist').innerHTML=rows.map(q=>`<tr><td>${q.time}</td><td>${q.m}</td><td>${q.asset}</td><td class="${q.sig==='CALL'?'green':q.sig==='PUT'?'red':'yellow'}">${q.sig}</td><td>${q.conf}</td><td>${q.why}</td></tr>`).join('');}
+function demoScan(){scan(makeDemo(),'Demo sample')}
+$('once').onclick=()=>{try{if(mode==='demo')demoScan();else if(data.length)scan(data,'Connected feed');else throw Error('Feed data not received yet.')}catch(e){status(e.message,'red')}}
+$('start').onclick=()=>{if(timer)return;if(mode==='demo'){demoScan();timer=setInterval(demoScan,+$('interval').value*1000);status('DEMO SCANNER RUNNING')}else{if(!data.length){status('WAITING FOR FEED DATA','yellow');return}scan(data,'Live feed');timer=setInterval(()=>{if(data.length)scan(data,'Live feed')},+$('interval').value*1000);status('LIVE SCANNER RUNNING','green')}$('start').disabled=true;$('stop').disabled=false}
+$('stop').onclick=()=>{clearInterval(timer);timer=null;$('start').disabled=false;$('stop').disabled=true;status('SCANNER STOPPED')}
+$('connect').onclick=async()=>{try{let url=$('feedurl').value.trim();if(!url)throw Error('Feed URL enter karein.');if($('feedtype').value==='rest'){let headers={};if($('token').value)headers.Authorization='Bearer '+$('token').value;let res=await fetch(url,{headers,cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);let j=await res.json();scan(j.candles,'Connected feed');mode='rest';status('REST FEED CONNECTED','green');}
+else{if(ws)ws.close();ws=new WebSocket(url);ws.onopen=()=>{mode='ws';status('WEBSOCKET CONNECTED · WAITING DATA','green')};ws.onmessage=e=>{try{let j=JSON.parse(e.data);scan(j.candles||j,'WebSocket')}catch(err){status('Bad WebSocket candle format','red')}};ws.onerror=()=>status('WEBSOCKET ERROR','red');}
+$('disconnect').disabled=false;
+}catch(e){status(e.message,'red')}}
+$('disconnect').onclick=()=>{if(ws)ws.close();ws=null;mode='demo';data=[];status('DEMO MODE');$('disconnect').disabled=true;clearInterval(timer);timer=null;$('start').disabled=false;$('stop').disabled=true}
+$('clear').onclick=()=>{rows=[];$('hist').innerHTML='<tr><td colspan="6" class="muted">No scans yet.</td></tr>'}
+$('asset').onchange=()=>{$('chartname').textContent=$('asset').value+' · '+(mode==='demo'?'DEMO CANDLES':'CONNECTED FEED')};
+demoScan();status('DEMO DATA · NOT LIVE');
+</script></body></html>
